@@ -18,9 +18,22 @@ export interface ChatMessage {
 export interface QuizQuestion {
   id: number;
   question: string;
-  options: string[];
-  correctAnswer: number;
+  options: string[]; // For quiz: list of answers. For sorting: [Label Left, Label Right]
+  correctAnswer: number; // Index of correct option
   explanation: string;
+  image?: string; // Optional illustration
+}
+
+export type GameType = 'QUIZ' | 'SORTING';
+
+export interface EthicsLevel {
+  id: number;
+  title: string;
+  description: string;
+  type: GameType;
+  questions: QuizQuestion[];
+  minScoreToUnlock: number;
+  icon: any; // Lucide Icon name
 }
 
 export interface EthicsScenario {

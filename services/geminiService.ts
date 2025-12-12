@@ -1,7 +1,20 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { Language } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// CARA MENDAPATKAN API KEY YANG PALING KUAT:
+// Cek process.env.API_KEY (dari define Vite) ATAU import.meta.env.VITE_API_KEY (standar Vite)
+// @ts-ignore
+const apiKey = process.env.API_KEY || import.meta.env.VITE_API_KEY;
+
+// Debugging di Console Browser
+if (!apiKey) {
+  console.error("⛔ [KidoAI Error] API Key tidak ditemukan! Pastikan Anda sudah mengatur 'VITE_API_KEY' di Vercel Settings.");
+} else {
+  console.log("✅ [KidoAI] Layanan AI Siap.");
+}
+
+// Inisialisasi SDK dengan penanganan error jika key kosong
+const ai = new GoogleGenAI({ apiKey: apiKey || "MISSING_KEY" });
 
 const getSystemInstruction = (lang: Language) => {
   if (lang === 'en') {
@@ -22,8 +35,23 @@ Selalu ingatkan bahwa AI adalah alat bantu, bukan pengganti otak manusia.
   `;
 }
 
+// Helper untuk pesan error yang ramah anak
+const getErrorMessage = (lang: Language, error: any) => {
+  const errStr = String(error);
+  if (errStr.includes("API key not valid") || errStr.includes("MISSING_KEY")) {
+    return lang === 'en' 
+      ? "Robo's battery key is missing! (API Key Error)" 
+      : "Kunci baterai Robo hilang! (Error API Key belum disetting)";
+  }
+  return lang === 'en' 
+    ? "Oops, poor connection. Robo can't hear you." 
+    : "Waduh, sinyalnya putus-putus. Robo tidak bisa mendengarmu.";
+};
+
 export const sendChatMessage = async (history: { role: string; text: string }[], message: string, lang: Language): Promise<string> => {
   try {
+    if (!apiKey) throw new Error("MISSING_KEY");
+
     const chat = ai.chats.create({
       model: 'gemini-2.5-flash',
       config: {
@@ -37,16 +65,17 @@ export const sendChatMessage = async (history: { role: string; text: string }[],
     });
 
     const response: GenerateContentResponse = await chat.sendMessage({ message });
-    return response.text || (lang === 'en' ? "Sorry, Robo is confused. Try asking again!" : "Maaf, Robo sedang bingung. Coba tanya lagi ya!");
+    return response.text || (lang === 'en' ? "Sorry, Robo is confused." : "Maaf, Robo sedang bingung.");
   } catch (error) {
     console.error("Chat Error:", error);
-    return lang === 'en' ? "Oops, connection lost. Let's try again!" : "Waduh, koneksi Robo terputus sebentar. Coba lagi yuk!";
+    return getErrorMessage(lang, error);
   }
 };
 
 export const generateKidImage = async (prompt: string, lang: Language): Promise<{ imageUrl?: string; text?: string }> => {
   try {
-    // We combine specific instruction for image generation safety
+    if (!apiKey) throw new Error("MISSING_KEY");
+
     const fullPrompt = lang === 'en' 
       ? `Create a cheerful and safe cartoon style image for kids based on this description: ${prompt}. Do not generate scary or inappropriate images.`
       : `Buatlah gambar kartun yang ceria dan aman untuk anak-anak berdasarkan deskripsi ini: ${prompt}. Jangan buat gambar yang menakutkan atau tidak pantas.`;
@@ -76,12 +105,14 @@ export const generateKidImage = async (prompt: string, lang: Language): Promise<
     return { imageUrl, text: textResponse };
   } catch (error) {
     console.error("Image Gen Error:", error);
-    throw new Error(lang === 'en' ? "Failed to create image." : "Gagal membuat gambar.");
+    throw new Error(getErrorMessage(lang, error));
   }
 };
 
 export const analyzeImageContent = async (base64Image: string, mimeType: string, lang: Language): Promise<string> => {
   try {
+    if (!apiKey) throw new Error("MISSING_KEY");
+
     const prompt = lang === 'en'
       ? "Look at this image. Explain what object this is to a small child with fun and interesting facts! The tone must be enthusiastic."
       : "Lihat gambar ini. Jelaskan benda apa ini kepada anak kecil dengan fakta menarik dan seru! Bahasanya harus antusias.";
@@ -106,6 +137,6 @@ export const analyzeImageContent = async (base64Image: string, mimeType: string,
     return response.text || (lang === 'en' ? "Robo can't see that clearly." : "Robo tidak bisa melihat benda itu dengan jelas.");
   } catch (error) {
     console.error("Vision Error:", error);
-    return lang === 'en' ? "Oops, Robo needs new glasses (error). Try another photo!" : "Wah, Robo butuh kacamata baru nih (error). Coba foto yang lain ya!";
+    return getErrorMessage(lang, error);
   }
 };

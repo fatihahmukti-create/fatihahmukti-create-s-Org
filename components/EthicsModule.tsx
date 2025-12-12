@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { ShieldCheck, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
-import { getEthicsQuestions } from '../utils/translations';
-import { Language } from '../types';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, CheckCircle, XCircle, RefreshCw, Lock, Star, Play, Map, ArrowRight, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { getEthicsLevels } from '../utils/translations';
+import { Language, EthicsLevel, QuizQuestion } from '../types';
 
 interface EthicsModuleProps {
   language: Language;
@@ -9,161 +9,362 @@ interface EthicsModuleProps {
 }
 
 const EthicsModule: React.FC<EthicsModuleProps> = ({ language, t }) => {
-  const ETHICS_QUESTIONS = getEthicsQuestions(language);
-  const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
+  const LEVELS = getEthicsLevels(language);
+  
+  // State
+  const [unlockedLevelIds, setUnlockedLevelIds] = useState<number[]>([1]);
+  const [activeLevel, setActiveLevel] = useState<EthicsLevel | null>(null);
+  const [gameStatus, setGameStatus] = useState<'MAP' | 'PLAYING' | 'RESULT'>('MAP');
+  
+  // Gameplay State
+  const [currentQIndex, setCurrentQIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
 
-  const currentQ = ETHICS_QUESTIONS[currentQuestionIdx];
+  // Load unlocked levels from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('kido_ethics_progress');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Merge with default [1] to ensure level 1 is always open
+          const uniqueIds = Array.from(new Set([...parsed, 1]));
+          setUnlockedLevelIds(uniqueIds);
+        }
+      } catch (e) {
+        console.error("Failed to load progress", e);
+      }
+    }
+  }, []);
+
+  const saveProgress = (newId: number) => {
+    const newUnlocked = Array.from(new Set([...unlockedLevelIds, newId]));
+    setUnlockedLevelIds(newUnlocked);
+    localStorage.setItem('kido_ethics_progress', JSON.stringify(newUnlocked));
+  };
+
+  const startLevel = (level: EthicsLevel) => {
+    setActiveLevel(level);
+    setGameStatus('PLAYING');
+    setCurrentQIndex(0);
+    setScore(0);
+    setSelectedOption(null);
+    setShowExplanation(false);
+  };
 
   const handleAnswer = (idx: number) => {
-    if (showResult) return;
+    if (showExplanation || !activeLevel) return;
+    
     setSelectedOption(idx);
-    setShowResult(true);
-    if (idx === currentQ.correctAnswer) {
+    setShowExplanation(true);
+    
+    const isCorrect = idx === activeLevel.questions[currentQIndex].correctAnswer;
+    if (isCorrect) {
       setScore(s => s + 1);
     }
   };
 
   const nextQuestion = () => {
-    if (currentQuestionIdx < ETHICS_QUESTIONS.length - 1) {
-      setCurrentQuestionIdx(prev => prev + 1);
+    if (!activeLevel) return;
+
+    if (currentQIndex < activeLevel.questions.length - 1) {
+      setCurrentQIndex(prev => prev + 1);
       setSelectedOption(null);
-      setShowResult(false);
+      setShowExplanation(false);
     } else {
-      setIsFinished(true);
+      setGameStatus('RESULT');
+      // Unlock next level if score is sufficient
+      if (score >= activeLevel.minScoreToUnlock) {
+        const nextId = activeLevel.id + 1;
+        if (LEVELS.find(l => l.id === nextId)) {
+          saveProgress(nextId);
+        }
+      }
     }
   };
 
-  const restartQuiz = () => {
-    setCurrentQuestionIdx(0);
-    setSelectedOption(null);
-    setShowResult(false);
-    setScore(0);
-    setIsFinished(false);
+  const backToMap = () => {
+    setGameStatus('MAP');
+    setActiveLevel(null);
   };
 
-  if (isFinished) {
-    return (
-      <div className="flex flex-col h-full bg-red-50 rounded-xl shadow-inner border border-red-100 p-6 items-center justify-center text-center">
-        <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
-           <ShieldCheck size={48} className={score === ETHICS_QUESTIONS.length ? "text-green-500" : "text-yellow-500"} />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">{t.ethics.finish_title}</h2>
-        <p className="text-gray-600 mb-6">{t.ethics.correct_count} <span className="font-bold text-red-500">{score}</span> {t.ethics.from} {ETHICS_QUESTIONS.length}.</p>
-        
-        {score === ETHICS_QUESTIONS.length ? (
-          <div className="bg-green-100 text-green-800 p-4 rounded-xl mb-6 text-sm">
-            {t.ethics.perfect_msg}
-          </div>
-        ) : (
-          <div className="bg-yellow-100 text-yellow-800 p-4 rounded-xl mb-6 text-sm">
-            {t.ethics.good_msg}
-          </div>
-        )}
+  // --- RENDERERS ---
 
-        <button 
-          onClick={restartQuiz}
-          className="bg-red-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-600 transition shadow-md flex items-center gap-2"
-        >
-          <RefreshCw size={20} /> {t.ethics.btn_retry}
-        </button>
-      </div>
-    );
-  }
+  const renderMap = () => (
+    <div className="p-6 flex flex-col items-center gap-6">
+       <div className="text-center mb-4">
+         <h2 className="text-2xl font-black text-slate-800">{t.ethics.title}</h2>
+         <p className="text-slate-500">{t.ethics.subtitle}</p>
+       </div>
 
-  return (
-    <div className="flex flex-col h-full bg-red-50 rounded-xl shadow-inner border border-red-100 overflow-y-auto">
-      <div className="bg-white p-4 border-b border-red-100">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-            <ShieldCheck className="text-red-500" />
-          </div>
-          <div>
-            <h2 className="font-bold text-gray-800">{t.ethics.title}</h2>
-            <p className="text-xs text-gray-500">{t.ethics.subtitle}</p>
-          </div>
-        </div>
-      </div>
+       <div className="flex flex-col gap-4 w-full max-w-md relative">
+          {/* Vertical connection line */}
+          <div className="absolute left-8 top-8 bottom-8 w-1 bg-slate-200 -z-0"></div>
 
-      <div className="p-4 flex-1 flex flex-col">
-        <div className="mb-4 flex justify-between items-center">
-          <span className="text-xs font-bold text-red-400 uppercase">{t.ethics.question_counter} {currentQuestionIdx + 1} / {ETHICS_QUESTIONS.length}</span>
-          <div className="h-2 flex-1 mx-4 bg-red-100 rounded-full">
-            <div 
-              className="h-full bg-red-500 rounded-full transition-all duration-500"
-              style={{ width: `${((currentQuestionIdx + 1) / ETHICS_QUESTIONS.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-
-        <h3 className="text-lg font-bold text-gray-800 mb-6 leading-tight">
-          {currentQ.question}
-        </h3>
-
-        <div className="space-y-3 mb-6">
-          {currentQ.options.map((opt, idx) => {
-            let btnClass = "w-full p-4 rounded-xl text-left text-sm font-medium transition-all border-2 ";
-            
-            if (showResult) {
-              if (idx === currentQ.correctAnswer) {
-                btnClass += "bg-green-100 border-green-400 text-green-800";
-              } else if (idx === selectedOption) {
-                btnClass += "bg-red-100 border-red-400 text-red-800";
-              } else {
-                btnClass += "bg-white border-transparent opacity-50";
-              }
-            } else {
-              btnClass += "bg-white border-transparent shadow-sm hover:border-red-200 hover:bg-red-50 text-gray-700";
-            }
+          {LEVELS.map((level) => {
+            const isUnlocked = unlockedLevelIds.includes(level.id);
+            const isCompleted = unlockedLevelIds.includes(level.id + 1) || (isUnlocked && unlockedLevelIds.length > level.id); // Simple logic for 'completed' visual
 
             return (
               <button
-                key={idx}
-                onClick={() => handleAnswer(idx)}
-                disabled={showResult}
-                className={btnClass}
+                key={level.id}
+                onClick={() => isUnlocked && startLevel(level)}
+                disabled={!isUnlocked}
+                className={`relative z-10 flex items-center gap-4 p-4 rounded-2xl border-b-4 transition-all w-full text-left
+                  ${isUnlocked 
+                    ? 'bg-white border-slate-200 hover:border-blue-300 hover:translate-y-1 hover:shadow-md cursor-pointer shadow-sm' 
+                    : 'bg-slate-100 border-slate-200 opacity-70 cursor-not-allowed grayscale'
+                  }
+                `}
               >
-                <div className="flex items-center gap-3">
-                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-bold shrink-0
-                     ${showResult && idx === currentQ.correctAnswer ? 'border-green-500 bg-green-500 text-white' : 
-                       showResult && idx === selectedOption ? 'border-red-500 bg-red-500 text-white' : 'border-gray-300 text-gray-400'
-                     }
-                   `}>
-                     {String.fromCharCode(65 + idx)}
-                   </div>
-                   {opt}
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-sm
+                   ${isUnlocked ? 'bg-gradient-to-br from-blue-400 to-indigo-500 text-white' : 'bg-slate-300 text-slate-500'}
+                `}>
+                   {isUnlocked ? <level.icon size={32} /> : <Lock size={32} />}
                 </div>
+                
+                <div className="flex-1">
+                   <div className="flex justify-between items-center mb-1">
+                     <span className={`text-xs font-bold uppercase tracking-wider ${isUnlocked ? 'text-blue-500' : 'text-slate-400'}`}>
+                       {t.ethics.level} {level.id}
+                     </span>
+                     {isUnlocked && (
+                       <span className="bg-yellow-100 text-yellow-700 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                         <Star size={10} fill="currentColor" /> {level.questions.length} XP
+                       </span>
+                     )}
+                   </div>
+                   <h3 className="font-bold text-slate-800 leading-tight mb-1">{level.title}</h3>
+                   <p className="text-xs text-slate-500 line-clamp-2">{level.description}</p>
+                </div>
+
+                {isUnlocked && (
+                  <div className="bg-blue-50 p-2 rounded-full text-blue-500">
+                    <Play size={20} fill="currentColor" />
+                  </div>
+                )}
               </button>
             );
           })}
+       </div>
+    </div>
+  );
+
+  const renderGame = () => {
+    if (!activeLevel) return null;
+    const q = activeLevel.questions[currentQIndex];
+    const progress = ((currentQIndex) / activeLevel.questions.length) * 100;
+
+    return (
+      <div className="flex flex-col h-full bg-white relative">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
+           <button onClick={backToMap} className="p-2 hover:bg-slate-200 rounded-lg text-slate-500">
+             <Map size={20} />
+           </button>
+           <div className="flex flex-col items-center w-full max-w-xs px-4">
+             <div className="flex justify-between w-full text-[10px] font-bold text-slate-400 uppercase mb-1">
+               <span>{t.ethics.question_counter} {currentQIndex + 1}</span>
+               <span>{activeLevel.questions.length}</span>
+             </div>
+             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+               <div className="h-full bg-blue-500 transition-all duration-500" style={{width: `${progress}%`}}></div>
+             </div>
+           </div>
+           <div className="p-2 bg-yellow-100 rounded-lg text-yellow-700 font-bold text-sm flex items-center gap-1 min-w-[3rem] justify-center">
+             <Star size={14} fill="currentColor" /> {score}
+           </div>
         </div>
 
-        {showResult && (
-          <div className="mt-auto animate-fade-in-up">
-            <div className={`p-4 rounded-xl border mb-4 flex gap-3 items-start ${selectedOption === currentQ.correctAnswer ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-               {selectedOption === currentQ.correctAnswer ? 
-                 <CheckCircle className="text-green-500 shrink-0 mt-0.5" size={20} /> : 
-                 <XCircle className="text-red-500 shrink-0 mt-0.5" size={20} />
-               }
-               <div>
-                 <p className={`font-bold text-sm mb-1 ${selectedOption === currentQ.correctAnswer ? 'text-green-700' : 'text-red-700'}`}>
-                   {selectedOption === currentQ.correctAnswer ? t.ethics.correct : t.ethics.incorrect}
-                 </p>
-                 <p className="text-sm text-gray-600 leading-relaxed">{currentQ.explanation}</p>
+        {/* Question Area */}
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center max-w-2xl mx-auto w-full">
+           
+           {/* Illustration Image */}
+           {q.image && (
+             <div className="w-full h-48 md:h-64 rounded-2xl overflow-hidden shadow-md mb-6 bg-slate-100 shrink-0">
+               <img 
+                 src={q.image} 
+                 alt="Question Illustration" 
+                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+               />
+             </div>
+           )}
+
+           <div className="mb-6 w-full text-center">
+             <span className="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-600 text-xs font-bold mb-3 uppercase tracking-wide">
+               {activeLevel.type === 'SORTING' ? 'Game Mode' : 'Quiz Mode'}
+             </span>
+             <h3 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">
+               {q.question}
+             </h3>
+             {activeLevel.type === 'SORTING' && (
+               <p className="text-sm text-slate-500 mt-2">{t.ethics.game_sorting_desc}</p>
+             )}
+           </div>
+
+           {/* Game Board */}
+           <div className="w-full flex-1 flex flex-col justify-start gap-4">
+              
+              {activeLevel.type === 'SORTING' ? (
+                // SORTING UI (2 Big Buttons)
+                <div className="grid grid-cols-2 gap-4 h-40 md:h-48">
+                   {q.options.map((opt, idx) => (
+                     <button
+                        key={idx}
+                        onClick={() => handleAnswer(idx)}
+                        disabled={showExplanation}
+                        className={`rounded-3xl border-b-8 font-black text-lg md:text-2xl transition-all flex flex-col items-center justify-center gap-2
+                          ${showExplanation 
+                             ? (idx === q.correctAnswer 
+                                ? 'bg-green-500 border-green-700 text-white scale-105' 
+                                : idx === selectedOption 
+                                   ? 'bg-red-500 border-red-700 text-white opacity-50' 
+                                   : 'bg-slate-100 border-slate-300 text-slate-300 opacity-20')
+                             : (idx === 0 
+                                ? 'bg-blue-100 border-blue-300 text-blue-600 hover:bg-blue-200 hover:border-blue-400 active:border-b-0 active:translate-y-2' 
+                                : 'bg-orange-100 border-orange-300 text-orange-600 hover:bg-orange-200 hover:border-orange-400 active:border-b-0 active:translate-y-2')
+                          }
+                        `}
+                     >
+                       {idx === 0 ? <ThumbsUp size={32} /> : <ThumbsDown size={32} />}
+                       {opt}
+                     </button>
+                   ))}
+                </div>
+              ) : (
+                // QUIZ UI (List Buttons)
+                <div className="space-y-3">
+                  {q.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleAnswer(idx)}
+                      disabled={showExplanation}
+                      className={`w-full p-4 rounded-xl text-left text-sm font-bold transition-all border-2 flex items-center gap-3
+                        ${showExplanation 
+                          ? (idx === q.correctAnswer 
+                             ? 'bg-green-100 border-green-500 text-green-800' 
+                             : idx === selectedOption 
+                                ? 'bg-red-100 border-red-500 text-red-800' 
+                                : 'bg-white border-slate-100 text-slate-300')
+                          : 'bg-white border-slate-100 text-slate-600 hover:border-blue-300 hover:bg-blue-50 shadow-sm'
+                        }
+                      `}
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs border-2 shrink-0
+                         ${showExplanation && idx === q.correctAnswer ? 'border-green-500 bg-green-500 text-white' : 
+                           showExplanation && idx === selectedOption ? 'border-red-500 bg-red-500 text-white' : 'border-slate-200 text-slate-400'}
+                      `}>
+                        {String.fromCharCode(65 + idx)}
+                      </div>
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+           </div>
+
+           {/* Feedback Area */}
+           {showExplanation && (
+             <div className="mt-6 w-full animate-fade-in-up pb-6">
+                <div className={`p-4 rounded-2xl border-l-4 mb-4 ${selectedOption === q.correctAnswer ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
+                   <div className="flex items-center gap-2 mb-2">
+                     {selectedOption === q.correctAnswer ? <CheckCircle className="text-green-600" size={20} /> : <XCircle className="text-red-600" size={20} />}
+                     <span className={`font-bold ${selectedOption === q.correctAnswer ? 'text-green-700' : 'text-red-700'}`}>
+                       {selectedOption === q.correctAnswer ? t.ethics.correct : t.ethics.incorrect}
+                     </span>
+                   </div>
+                   <p className="text-sm text-slate-600 leading-relaxed">{q.explanation}</p>
+                </div>
+                <button 
+                  onClick={nextQuestion}
+                  className="w-full bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-slate-700 active:scale-95 transition flex items-center justify-center gap-2"
+                >
+                  {t.ethics.btn_next} <ArrowRight size={18} />
+                </button>
+             </div>
+           )}
+
+        </div>
+      </div>
+    );
+  };
+
+  const renderResult = () => {
+    if (!activeLevel) return null;
+    const isPassed = score >= activeLevel.minScoreToUnlock;
+    const percent = Math.round((score / activeLevel.questions.length) * 100);
+
+    return (
+      <div className="flex flex-col h-full bg-gradient-to-br from-blue-50 to-indigo-50 p-6 items-center justify-center text-center overflow-y-auto">
+         <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm border border-white/50 relative overflow-hidden">
+            {/* Confetti or Fail bg */}
+            <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${isPassed ? 'from-green-400 to-emerald-500' : 'from-red-400 to-orange-500'}`}></div>
+
+            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 ring-8 ring-opacity-20 ${isPassed ? 'bg-green-100 ring-green-500' : 'bg-red-100 ring-red-500'}`}>
+              {isPassed ? <ShieldCheck size={48} className="text-green-500" /> : <RefreshCw size={48} className="text-red-500" />}
+            </div>
+
+            <h2 className="text-2xl font-black text-slate-800 mb-2">{isPassed ? t.ethics.finish_title : t.ethics.incorrect}</h2>
+            <p className="text-slate-500 text-sm mb-6">{isPassed ? "Level completed! You are awesome." : "Don't give up! Let's try again."}</p>
+
+            <div className="grid grid-cols-2 gap-4 mb-8">
+               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                  <p className="text-xs text-slate-400 font-bold uppercase mb-1">Score</p>
+                  <p className={`text-2xl font-black ${isPassed ? 'text-green-600' : 'text-red-600'}`}>{percent}%</p>
+               </div>
+               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                  <p className="text-xs text-slate-400 font-bold uppercase mb-1">Correct</p>
+                  <p className="text-2xl font-black text-slate-700">{score}/{activeLevel.questions.length}</p>
                </div>
             </div>
-            <button
-              onClick={nextQuestion}
-              className="w-full bg-gray-800 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-gray-700 transition"
-            >
-              {currentQuestionIdx < ETHICS_QUESTIONS.length - 1 ? t.ethics.btn_next : t.ethics.btn_result}
-            </button>
-          </div>
-        )}
+
+            {!isPassed && (
+               <div className="bg-orange-50 text-orange-800 text-xs p-3 rounded-xl mb-6 border border-orange-100">
+                  {t.ethics.min_score} <strong>{activeLevel.minScoreToUnlock}</strong> {t.ethics.to_unlock}
+               </div>
+            )}
+
+            <div className="space-y-3">
+               {isPassed && unlockedLevelIds.includes(activeLevel.id + 1) ? (
+                 <button 
+                   onClick={() => {
+                      const nextLevel = LEVELS.find(l => l.id === activeLevel.id + 1);
+                      if (nextLevel) startLevel(nextLevel);
+                      else backToMap();
+                   }}
+                   className="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-green-600 active:scale-95 transition"
+                 >
+                   {t.ethics.btn_next}
+                 </button>
+               ) : (
+                 <button 
+                   onClick={() => startLevel(activeLevel)}
+                   className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold shadow-md hover:bg-slate-700 active:scale-95 transition"
+                 >
+                   {t.ethics.btn_retry}
+                 </button>
+               )}
+               
+               <button 
+                 onClick={backToMap}
+                 className="w-full bg-white text-slate-600 py-3 rounded-xl font-bold border-2 border-slate-100 hover:bg-slate-50 transition"
+               >
+                 {t.ethics.btn_home}
+               </button>
+            </div>
+         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="h-full bg-slate-50 rounded-xl shadow-inner border border-slate-200 overflow-hidden">
+      {gameStatus === 'MAP' && renderMap()}
+      {gameStatus === 'PLAYING' && renderGame()}
+      {gameStatus === 'RESULT' && renderResult()}
     </div>
   );
 };

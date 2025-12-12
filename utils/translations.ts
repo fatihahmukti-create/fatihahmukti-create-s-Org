@@ -1,5 +1,5 @@
-import { QuizQuestion, Language } from '../types';
-import { Brain, Lightbulb, BookOpen, ShieldAlert } from 'lucide-react';
+import { QuizQuestion, Language, EthicsLevel } from '../types';
+import { Brain, Lightbulb, BookOpen, ShieldAlert, Star, Lock, Zap, Search, GraduationCap } from 'lucide-react';
 
 export const translations = {
   id: {
@@ -22,8 +22,8 @@ export const translations = {
       btn_image_desc: 'Buat gambar kartun',
       btn_vision_title: 'Detektif AI',
       btn_vision_desc: 'Kenali benda sekitar',
-      btn_ethics_title: 'Kuis Etika',
-      btn_ethics_desc: 'Uji pemahamanmu',
+      btn_ethics_title: 'Petualangan Etika',
+      btn_ethics_desc: 'Mainkan game level!',
       did_you_know_title: 'Tahukah Kamu?',
       did_you_know_desc: 'AI tidak punya perasaan. Jadi kalau kamu curhat, dia hanya membalas berdasarkan apa yang dia baca, bukan apa yang dia rasakan.',
       id_badge: 'ID'
@@ -69,26 +69,29 @@ export const translations = {
       disclaimer: 'Detektif AI pintar, tapi kadang bisa salah lihat. Jangan lupa cek sendiri ya!'
     },
     ethics: {
-      title: 'Zona Etika',
-      subtitle: 'Belajar pakai AI dengan benar',
-      question_counter: 'SOAL',
-      correct: 'Jawabanmu Benar!',
-      incorrect: 'Kurang Tepat.',
-      finish_title: 'Quiz Selesai!',
-      correct_count: 'Kamu menjawab benar',
-      from: 'dari',
-      perfect_msg: 'Wow! Kamu adalah Pahlawan Etika AI! Terus gunakan teknologi dengan bijak ya.',
-      good_msg: 'Bagus! Tapi masih perlu belajar lagi biar makin bijak pakai AI. Semangat!',
-      btn_retry: 'Main Lagi',
-      btn_next: 'Lanjut Soal Berikutnya',
-      btn_result: 'Lihat Hasil'
+      title: 'Petualangan Etika',
+      subtitle: 'Jadilah Master AI yang Bijak!',
+      level: 'Level',
+      locked: 'Terkunci',
+      start: 'Mulai',
+      question_counter: 'Soal',
+      correct: 'Hebat! Jawabanmu Benar!',
+      incorrect: 'Ups! Kurang Tepat.',
+      finish_title: 'Level Selesai!',
+      score: 'Skor Kamu:',
+      min_score: 'Butuh skor',
+      to_unlock: 'untuk buka level selanjutnya.',
+      btn_retry: 'Coba Lagi',
+      btn_home: 'Kembali ke Peta',
+      btn_next: 'Level Berikutnya',
+      game_sorting_desc: 'Pilih tombol Kiri atau Kanan!'
     },
     learn: {
       title: 'Kelas AI',
       subtitle: 'Kurikulum Belajar Pintar',
       finish_alert_title: 'Selamat Belajar! 🎓',
-      finish_alert_desc: 'Selesaikan semua bab di atas, lalu coba alat-alat AI di menu bawah. Jangan lupa ikut Kuis Etika di Bab 4 ya!',
-      btn_quiz: 'Mulai Kuis Etika'
+      finish_alert_desc: 'Selesaikan semua bab di atas, lalu coba alat-alat AI di menu bawah. Jangan lupa mainkan Petualangan Etika!',
+      btn_quiz: 'Mulai Petualangan'
     }
   },
   en: {
@@ -111,8 +114,8 @@ export const translations = {
       btn_image_desc: 'Create cartoon images',
       btn_vision_title: 'AI Detective',
       btn_vision_desc: 'Identify objects',
-      btn_ethics_title: 'Ethics Quiz',
-      btn_ethics_desc: 'Test your knowledge',
+      btn_ethics_title: 'Ethics Adventure',
+      btn_ethics_desc: 'Play level game!',
       did_you_know_title: 'Did You Know?',
       did_you_know_desc: 'AI doesn\'t have feelings. If you tell it a secret, it replies based on what it reads, not what it feels.',
       id_badge: 'EN'
@@ -158,145 +161,177 @@ export const translations = {
       disclaimer: 'AI Detective is smart, but can make mistakes. Don\'t forget to check yourself!'
     },
     ethics: {
-      title: 'Ethics Zone',
-      subtitle: 'Learn to use AI correctly',
-      question_counter: 'QUESTION',
-      correct: 'Correct Answer!',
-      incorrect: 'Not quite right.',
-      finish_title: 'Quiz Finished!',
-      correct_count: 'You answered correctly',
-      from: 'out of',
-      perfect_msg: 'Wow! You are an AI Ethics Hero! Keep using technology wisely.',
-      good_msg: 'Good job! But keep learning to become wiser using AI. Fighting!',
-      btn_retry: 'Play Again',
-      btn_next: 'Next Question',
-      btn_result: 'See Results'
+      title: 'Ethics Adventure',
+      subtitle: 'Become a Wise AI Master!',
+      level: 'Level',
+      locked: 'Locked',
+      start: 'Start',
+      question_counter: 'Question',
+      correct: 'Awesome! Correct Answer!',
+      incorrect: 'Oops! Not quite right.',
+      finish_title: 'Level Complete!',
+      score: 'Your Score:',
+      min_score: 'Need score',
+      to_unlock: 'to unlock next level.',
+      btn_retry: 'Try Again',
+      btn_home: 'Back to Map',
+      btn_next: 'Next Level',
+      game_sorting_desc: 'Choose Left or Right button!'
     },
     learn: {
       title: 'AI Class',
       subtitle: 'Smart Learning Curriculum',
       finish_alert_title: 'Happy Learning! 🎓',
-      finish_alert_desc: 'Finish all chapters above, then try the AI tools in the menu below. Don\'t forget to take the Ethics Quiz in Chapter 4!',
-      btn_quiz: 'Start Ethics Quiz'
+      finish_alert_desc: 'Finish all chapters above, then try the AI tools in the menu below. Don\'t forget to play the Ethics Adventure!',
+      btn_quiz: 'Start Adventure'
     }
   }
 };
 
-export const getEthicsQuestions = (lang: Language): QuizQuestion[] => {
-  if (lang === 'en') {
-    return [
-      {
-        id: 1,
-        question: "Your friend asks you to do their Math homework using AI. What should you do?",
-        options: [
-          "Do all the answers using AI for them.",
-          "Invite them to study together and use AI only to explain formulas.",
-          "Just ignore them and let them not do the homework."
-        ],
-        correctAnswer: 1,
-        explanation: "Correct! AI is a study tool, not a cheating tool. If AI does the work, our brains won't get smarter!"
-      },
-      {
-        id: 2,
-        question: "You see a photo of your favorite artist doing something weird online, but it's actually AI-made (Deepfake). What is your attitude?",
-        options: [
-          "Immediately share it to all friends.",
-          "Believe it because the picture looks real.",
-          "Check the truth first and don't spread it carelessly."
-        ],
-        correctAnswer: 2,
-        explanation: "Awesome! We must be critical. Not everything online is real. Spreading hoaxes is bad."
-      },
-      {
-        id: 3,
-        question: "Is it okay to ask AI to create rude words to mock others?",
-        options: [
-          "It's okay, just for fun.",
-          "No, that's called Cyberbullying.",
-          "It's okay if the person is annoying."
-        ],
-        correctAnswer: 1,
-        explanation: "Exactly! Using technology to hurt others' feelings is very wrong. We must stay polite."
-      },
-      {
-        id: 4,
-        question: "Is it safe to tell AI your full name, home address, and school name?",
-        options: [
-          "Yes, AI is a trusted friend.",
-          "No, that is private information (Privacy). We shouldn't share it with strangers or AI.",
-          "It's okay if nobody else sees it."
-        ],
-        correctAnswer: 1,
-        explanation: "Smart! Never share private information online or with AI. We must protect our privacy!"
-      },
-      {
-        id: 5,
-        question: "If you ask AI to draw a 'Doctor', it only draws men. Why?",
-        options: [
-          "Because only men can be doctors.",
-          "Because AI learns from old data that might be biased (unfair).",
-          "Because AI likes men better."
-        ],
-        correctAnswer: 1,
-        explanation: "Right! This is called 'Bias'. AI learns from internet data, which can sometimes be unfair. We know that anyone can be a doctor!"
-      }
-    ];
-  }
+export const getEthicsLevels = (lang: Language): EthicsLevel[] => {
+  const isId = lang === 'id';
+
   return [
     {
       id: 1,
-      question: "Temanmu minta dibuatkan PR Matematika pakai AI. Apa yang harus kamu lakukan?",
-      options: [
-        "Bantu buatkan semua jawabannya pakai AI.",
-        "Ajak dia belajar bareng dan pakai AI cuma untuk jelaskan rumus.",
-        "Biarkan saja dia tidak kerjakan PR."
-      ],
-      correctAnswer: 1,
-      explanation: "Betul! AI itu alat bantu belajar, bukan alat curang. Kalau AI yang kerjakan, otak kita tidak jadi pintar!"
+      title: isId ? "Dasar Keamanan AI" : "AI Safety Basics",
+      description: isId ? "Belajar hal dasar tentang privasi dan cara bicara dengan AI." : "Learn basics about privacy and talking to AI.",
+      type: 'QUIZ',
+      minScoreToUnlock: 2,
+      icon: ShieldAlert,
+      questions: [
+        {
+          id: 1,
+          question: isId ? "Bolehkah memberi tahu alamat rumah ke AI?" : "Is it okay to tell AI your home address?",
+          options: isId ? ["Boleh dong", "Tidak Boleh (Bahaya)", "Boleh asal AI janji"] : ["Sure", "No Way (Dangerous)", "Only if AI promises"],
+          correctAnswer: 1,
+          explanation: isId ? "Data pribadi seperti alamat itu rahasia! Jangan sebar di internet." : "Private data like address is secret! Don't share it online.",
+          image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80" // House
+        },
+        {
+          id: 2,
+          question: isId ? "Jika AI memberi jawaban yang aneh, apa yang kamu lakukan?" : "If AI gives a weird answer, what do you do?",
+          options: isId ? ["Percaya saja", "Marah ke AI", "Cek lagi di buku/internet"] : ["Just believe it", "Get angry", "Double check facts"],
+          correctAnswer: 2,
+          explanation: isId ? "AI bisa salah (halusinasi). Kita harus selalu cek fakta." : "AI can make mistakes (hallucinate). Always fact check.",
+          image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80" // Robot
+        },
+        {
+          id: 3,
+          question: isId ? "Bolehkah minta AI membuatkan PR Sekolah?" : "Can you ask AI to do your homework?",
+          options: isId ? ["Boleh, biar cepat", "Jangan, itu curang", "Boleh sedikit"] : ["Yes, faster", "No, that's cheating", "Maybe a little"],
+          correctAnswer: 1,
+          explanation: isId ? "AI untuk membantumu belajar, bukan menggantikanmu belajar!" : "AI is to help you learn, not to learn for you!",
+          image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80" // Books
+        }
+      ]
     },
     {
       id: 2,
-      question: "Kamu melihat foto artis favoritmu melakukan hal aneh di internet, tapi ternyata itu buatan AI (Deepfake). Apa sikapmu?",
-      options: [
-        "Langsung sebarkan ke semua teman.",
-        "Percaya saja karena gambarnya terlihat nyata.",
-        "Cek dulu kebenarannya dan jangan disebarkan sembarangan."
-      ],
-      correctAnswer: 2,
-      explanation: "Keren! Kita harus kritis. Tidak semua yang kita lihat di internet itu nyata. Menyebarkan hoax itu tidak baik."
+      title: isId ? "Game: Baik vs Buruk" : "Game: Good vs Bad",
+      description: isId ? "Pilih dengan cepat! Mana penggunaan AI yang baik dan mana yang jahat?" : "Choose fast! Which AI use is good and which is bad?",
+      type: 'SORTING',
+      minScoreToUnlock: 4,
+      icon: Zap,
+      questions: [
+        {
+          id: 1,
+          question: isId ? "Membuat poster kampanye lingkungan" : "Making an eco-friendly poster",
+          options: isId ? ["👍 BAIK", "👎 BURUK"] : ["👍 GOOD", "👎 BAD"],
+          correctAnswer: 0,
+          explanation: isId ? "Menggunakan AI untuk kreativitas positif itu hebat!" : "Using AI for positive creativity is great!",
+          image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80" // Nature
+        },
+        {
+          id: 2,
+          question: isId ? "Membuat foto palsu teman sedang menangis" : "Making a fake photo of a friend crying",
+          options: isId ? ["👍 BAIK", "👎 BURUK"] : ["👍 GOOD", "👎 BAD"],
+          correctAnswer: 1,
+          explanation: isId ? "Itu bullying! Jangan gunakan AI untuk menyakiti orang lain." : "That's bullying! Never use AI to hurt others.",
+          image: "https://images.unsplash.com/photo-1605904351945-8c707d89668d?w=800&q=80" // Sad icon concept / Cyberbullying abstract
+        },
+        {
+          id: 3,
+          question: isId ? "Mencari ide kado ulang tahun ibu" : "Finding birthday gift ideas for mom",
+          options: isId ? ["👍 BAIK", "👎 BURUK"] : ["👍 GOOD", "👎 BAD"],
+          correctAnswer: 0,
+          explanation: isId ? "AI asisten yang hebat untuk brainstorming ide." : "AI is a great assistant for brainstorming.",
+          image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&q=80" // Gift
+        },
+        {
+          id: 4,
+          question: isId ? "Meniru suara guru untuk menipu teman" : "Cloning teacher's voice to prank friends",
+          options: isId ? ["👍 BAIK", "👎 BURUK"] : ["👍 GOOD", "👎 BAD"],
+          correctAnswer: 1,
+          explanation: isId ? "Meniru identitas orang lain (Deepfake suara) itu berbahaya dan dilarang." : "Impersonating others (Voice Deepfake) is dangerous and wrong.",
+          image: "https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?w=800&q=80" // Mic
+        },
+        {
+          id: 5,
+          question: isId ? "Menerjemahkan bahasa asing untuk belajar" : "Translating foreign languages to learn",
+          options: isId ? ["👍 BAIK", "👎 BURUK"] : ["👍 GOOD", "👎 BAD"],
+          correctAnswer: 0,
+          explanation: isId ? "Sangat membantu untuk komunikasi!" : "Very helpful for communication!",
+          image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80" // Globe/Tech
+        }
+      ]
     },
     {
       id: 3,
-      question: "Bolehkah kita menyuruh AI membuat kata-kata kasar untuk mengejek orang lain?",
-      options: [
-        "Boleh, kan cuma main-main.",
-        "Tidak boleh, itu namanya Cyberbullying.",
-        "Boleh kalau orangnya menyebalkan."
-      ],
-      correctAnswer: 1,
-      explanation: "Tepat sekali! Menggunakan teknologi untuk menyakiti perasaan orang lain itu salah besar. Kita harus tetap sopan."
+      title: isId ? "Detektif Hoax & Bias" : "Hoax & Bias Detective",
+      description: isId ? "Soal lebih sulit tentang berita palsu dan ketidakadilan AI." : "Harder questions about fake news and AI unfairness.",
+      type: 'QUIZ',
+      minScoreToUnlock: 3,
+      icon: Search,
+      questions: [
+        {
+          id: 1,
+          question: isId ? "Apa itu 'Bias' dalam AI?" : "What is 'Bias' in AI?",
+          options: isId ? ["AI rusak", "AI pilih kasih / tidak adil", "AI sangat pintar"] : ["Broken AI", "Unfair AI", "Super Smart AI"],
+          correctAnswer: 1,
+          explanation: isId ? "Bias terjadi jika AI belajar dari data yang tidak lengkap, misal menganggap Dokter selalu Pria." : "Bias happens when AI learns from incomplete data, e.g. thinking Doctors are always men.",
+          image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&q=80" // Scales of justice
+        },
+        {
+          id: 2,
+          question: isId ? "Foto orang di internet terlihat sangat nyata. Apakah pasti asli?" : "A photo online looks super real. Is it definitely real?",
+          options: isId ? ["Pasti asli", "Belum tentu (Bisa Deepfake)", "Tergantung kamera"] : ["Definitely real", "Not sure (Deepfake)", "Depends on camera"],
+          correctAnswer: 1,
+          explanation: isId ? "Zaman sekarang, AI bisa membuat foto manusia yang tidak nyata (Deepfake)." : "Nowadays, AI can create realistic photos of fake people (Deepfake).",
+          image: "https://images.unsplash.com/photo-1535378437323-9555f3e7f6aa?w=800&q=80" // AI Face / Abstract
+        },
+        {
+          id: 3,
+          question: isId ? "Kenapa AI tidak boleh mengambil keputusan hukum (Pengadilan) sendiri?" : "Why shouldn't AI make legal decisions (Court) alone?",
+          options: isId ? ["Karena AI tidak punya hati nurani", "Karena AI mahal", "Karena AI lambat"] : ["AI has no conscience", "AI is expensive", "AI is slow"],
+          correctAnswer: 0,
+          explanation: isId ? "Keputusan penting butuh rasa kemanusiaan dan empati yang tidak dimiliki robot." : "Important decisions need humanity and empathy which robots don't have.",
+          image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&q=80" // Court
+        },
+        {
+          id: 4,
+          question: isId ? "Jika temanmu menyebar berita bohong buatan AI, kamu harus apa?" : "Friend shares fake AI news, what do you do?",
+          options: isId ? ["Ikut menyebarkan", "Diam saja", "Tegur dan beri tahu fakta"] : ["Share it too", "Stay silent", "Correct them politely"],
+          correctAnswer: 2,
+          explanation: isId ? "Jadilah pahlawan anti-hoax! Hentikan penyebaran berita palsu." : "Be an anti-hoax hero! Stop the spread of fake news.",
+          image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80" // News
+        }
+      ]
     },
     {
       id: 4,
-      question: "Apakah aman memberitahu AI nama lengkap, alamat rumah, dan nama sekolahmu?",
-      options: [
-        "Aman kok, AI kan teman baik.",
-        "Tidak boleh, itu data pribadi (Privasi). Jangan sembarangan disebar.",
-        "Boleh saja kalau tidak ada orang lain yang lihat."
-      ],
-      correctAnswer: 1,
-      explanation: "Pintar! Jangan pernah membagikan informasi pribadi (seperti alamat rumah) di internet atau ke AI. Kita harus jaga privasi!"
-    },
-    {
-      id: 5,
-      question: "Jika kamu minta AI menggambar 'Dokter', AI cuma menggambar laki-laki saja. Kenapa?",
-      options: [
-        "Karena cuma laki-laki yang bisa jadi dokter.",
-        "Karena AI belajar dari data lama yang mungkin Bias (tidak adil).",
-        "Karena AI lebih suka laki-laki."
-      ],
-      correctAnswer: 1,
-      explanation: "Benar! Ini namanya 'Bias'. AI belajar dari data internet yang kadang kurang adil. Padahal kita tahu siapa saja bisa jadi dokter!"
+      title: isId ? "Master Etika AI" : "AI Ethics Master",
+      description: isId ? "Tantangan terakhir untuk mendapatkan gelar Master!" : "Final challenge to get the Master title!",
+      type: 'SORTING',
+      minScoreToUnlock: 5,
+      icon: GraduationCap,
+      questions: [
+        { id: 1, question: isId ? "AI menggantikan semua pekerjaan manusia" : "AI replacing all human jobs", options: isId ? ["FAKTA", "MITOS"] : ["FACT", "MYTH"], correctAnswer: 1, explanation: isId ? "AI adalah alat bantu, kreativitas manusia tetap dibutuhkan." : "AI is a tool, human creativity is still needed.", image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" }, // Worker
+        { id: 2, question: isId ? "AI bisa membaca pikiranmu" : "AI can read your mind", options: isId ? ["FAKTA", "MITOS"] : ["FACT", "MYTH"], correctAnswer: 1, explanation: isId ? "AI cuma menebak kata selanjutnya berdasarkan data, bukan baca pikiran." : "AI just predicts next words based on data, not mind reading.", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80" }, // Brain
+        { id: 3, question: isId ? "Kita bertanggung jawab atas apa yang kita buat dengan AI" : "We are responsible for what we make with AI", options: isId ? ["FAKTA", "MITOS"] : ["FACT", "MYTH"], correctAnswer: 0, explanation: isId ? "Betul! Kalau kamu pakai AI buat hal jahat, itu salahmu, bukan salah AI." : "Right! If you use AI for bad things, it's on you, not the AI.", image: "https://images.unsplash.com/photo-1555421689-d68471e189f2?w=800&q=80" }, // Responsibility
+        { id: 4, question: isId ? "AI selalu netral dan objektif" : "AI is always neutral and objective", options: isId ? ["FAKTA", "MITOS"] : ["FACT", "MYTH"], correctAnswer: 1, explanation: isId ? "Tidak. AI punya bias tergantung data yang dipelajarinya." : "No. AI has bias depending on its training data.", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80" }, // Meeting
+        { id: 5, question: isId ? "Masa depan AI ada di tangan kita" : "The future of AI is in our hands", options: isId ? ["FAKTA", "MITOS"] : ["FACT", "MYTH"], correctAnswer: 0, explanation: isId ? "Kita yang menentukan apakah AI jadi alat baik atau buruk!" : "We decide if AI becomes a tool for good or bad!", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80" } // Future/Earth
+      ]
     }
   ];
 };
@@ -333,7 +368,7 @@ export const getLearningChapters = (lang: Language) => {
       r2t: "Check Facts:", r2d: "AI can be wrong (hallucinate). Always double-check info.",
       r3t: "Be Polite:", r3d: "Don't ask AI to make rude words or mean pictures.",
       footer: "Understood? Let's test your knowledge!",
-      btn: "Start Ethics Quiz"
+      btn: "Start Ethics Adventure"
     }
   } : {
     c1: {
@@ -366,7 +401,7 @@ export const getLearningChapters = (lang: Language) => {
       r2t: "Cek Fakta:", r2d: "AI kadang bisa salah (halusinasi). Selalu cek ulang informasinya.",
       r3t: "Sopan Santun:", r3d: "Jangan minta AI membuat kata-kata kasar atau gambar yang jahat.",
       footer: "Sudah paham? Yuk tes pengetahuanmu!",
-      btn: "Mulai Kuis Etika"
+      btn: "Mulai Petualangan"
     }
   };
 
