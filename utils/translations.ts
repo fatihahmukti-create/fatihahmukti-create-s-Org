@@ -40,7 +40,7 @@ export const translations = {
       placeholder: 'Tulis pesanmu di sini...',
       loading: 'Robo sedang berpikir...',
       reminder: 'Ingat, selalu sopan saat bicara dengan AI ya!',
-      initial_msg: 'Halo! Aku Robo. Kamu mau belajar apa tentang AI hari ini? Atau mau dengar cerita seru?',
+      initial_msg: 'Halo! Aku Robo. Kamu mau belajar apa tentang AI hari ini? Atau mau dengar fakta seru tentang pembelajaran dan etika AI?',
       user: 'Kamu',
       bot: 'Robo'
     },
@@ -53,8 +53,8 @@ export const translations = {
       loading_text: 'Sedang melukis...',
       empty_state: 'Hasil gambarmu akan muncul di sini',
       save: 'Simpan',
-      suggestions_title: 'IDE SERU:',
-      suggestions: ['Kucing astronot di bulan', 'Rumah permen warna-warni', 'Dinosaurus main skateboard', 'Kota masa depan yang hijau'],
+      suggestions_title: 'IDE SERU (KLIK AJA):',
+      suggestions: ['Kucing astronot di bulan', 'Rumah permen warna-warni', 'Dinosaurus main skateboard', 'Kota masa depan yang hijau', 'Robot sedang membaca buku', 'Mobil terbang di atas awan'],
       ethics_warning: 'Info Etika:',
       ethics_desc: 'Semua gambar dibuat oleh komputer (AI), bukan manusia. Jangan gunakan untuk meniru wajah temanmu tanpa izin ya!'
     },
@@ -129,7 +129,7 @@ export const translations = {
       placeholder: 'Type your message here...',
       loading: 'Robo is thinking...',
       reminder: 'Remember, always be polite when talking to AI!',
-      initial_msg: 'Hi! I\'m Robo. What do you want to learn about AI today? Or do you want to hear a fun story?',
+      initial_msg: 'Hi! I\'m Robo. What do you want to learn about AI today? Or do you want to hear a fun fact about AI learning and ethics?',
       user: 'You',
       bot: 'Robo'
     },
@@ -142,8 +142,8 @@ export const translations = {
       loading_text: 'Painting...',
       empty_state: 'Your masterpiece will appear here',
       save: 'Save',
-      suggestions_title: 'FUN IDEAS:',
-      suggestions: ['Astronaut cat on the moon', 'Colorful candy house', 'Dinosaur skateboarding', 'Green futuristic city'],
+      suggestions_title: 'FUN IDEAS (CLICK ME):',
+      suggestions: ['Astronaut cat on the moon', 'Colorful candy house', 'Dinosaur skateboarding', 'Green futuristic city', 'Robot reading a book', 'Flying car over clouds'],
       ethics_warning: 'Ethics Info:',
       ethics_desc: 'All images are made by computer (AI), not humans. Do not use it to mimic your friend\'s face without permission!'
     },
@@ -217,6 +217,28 @@ export const getEthicsQuestions = (lang: Language): QuizQuestion[] => {
         ],
         correctAnswer: 1,
         explanation: "Exactly! Using technology to hurt others' feelings is very wrong. We must stay polite."
+      },
+      {
+        id: 4,
+        question: "Is it safe to tell AI your full name, home address, and school name?",
+        options: [
+          "Yes, AI is a trusted friend.",
+          "No, that is private information (Privacy). We shouldn't share it with strangers or AI.",
+          "It's okay if nobody else sees it."
+        ],
+        correctAnswer: 1,
+        explanation: "Smart! Never share private information online or with AI. We must protect our privacy!"
+      },
+      {
+        id: 5,
+        question: "If you ask AI to draw a 'Doctor', it only draws men. Why?",
+        options: [
+          "Because only men can be doctors.",
+          "Because AI learns from old data that might be biased (unfair).",
+          "Because AI likes men better."
+        ],
+        correctAnswer: 1,
+        explanation: "Right! This is called 'Bias'. AI learns from internet data, which can sometimes be unfair. We know that anyone can be a doctor!"
       }
     ];
   }
@@ -253,6 +275,28 @@ export const getEthicsQuestions = (lang: Language): QuizQuestion[] => {
       ],
       correctAnswer: 1,
       explanation: "Tepat sekali! Menggunakan teknologi untuk menyakiti perasaan orang lain itu salah besar. Kita harus tetap sopan."
+    },
+    {
+      id: 4,
+      question: "Apakah aman memberitahu AI nama lengkap, alamat rumah, dan nama sekolahmu?",
+      options: [
+        "Aman kok, AI kan teman baik.",
+        "Tidak boleh, itu data pribadi (Privasi). Jangan sembarangan disebar.",
+        "Boleh saja kalau tidak ada orang lain yang lihat."
+      ],
+      correctAnswer: 1,
+      explanation: "Pintar! Jangan pernah membagikan informasi pribadi (seperti alamat rumah) di internet atau ke AI. Kita harus jaga privasi!"
+    },
+    {
+      id: 5,
+      question: "Jika kamu minta AI menggambar 'Dokter', AI cuma menggambar laki-laki saja. Kenapa?",
+      options: [
+        "Karena cuma laki-laki yang bisa jadi dokter.",
+        "Karena AI belajar dari data lama yang mungkin Bias (tidak adil).",
+        "Karena AI lebih suka laki-laki."
+      ],
+      correctAnswer: 1,
+      explanation: "Benar! Ini namanya 'Bias'. AI belajar dari data internet yang kadang kurang adil. Padahal kita tahu siapa saja bisa jadi dokter!"
     }
   ];
 };

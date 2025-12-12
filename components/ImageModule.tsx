@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { generateKidImage } from '../services/geminiService';
-import { ImageIcon, Wand2, RefreshCw, Download } from 'lucide-react';
+import { ImageIcon, Wand2, RefreshCw, Download, Sparkles } from 'lucide-react';
 import { Language } from '../types';
 
 interface ImageModuleProps {
@@ -31,10 +31,25 @@ const ImageModule: React.FC<ImageModuleProps> = ({ language, t }) => {
   };
 
   const suggestions = t.image.suggestions;
+  // Duplicate suggestions to create seamless loop
+  const carouselItems = [...suggestions, ...suggestions];
 
   return (
-    <div className="flex flex-col h-full bg-purple-50 rounded-xl shadow-inner border border-purple-100 overflow-y-auto">
-      <div className="bg-white p-4 border-b border-purple-100">
+    <div className="flex flex-col h-full bg-purple-50 rounded-xl shadow-inner border border-purple-100 overflow-hidden relative">
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+          animation: scroll 20s linear infinite;
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <div className="bg-white p-4 border-b border-purple-100 z-10">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
             <Wand2 className="text-purple-600" />
@@ -46,9 +61,9 @@ const ImageModule: React.FC<ImageModuleProps> = ({ language, t }) => {
         </div>
       </div>
 
-      <div className="p-4 flex-1 flex flex-col items-center">
+      <div className="p-4 flex-1 flex flex-col items-center overflow-y-auto">
         {/* Output Area */}
-        <div className="w-full aspect-square bg-white rounded-2xl border-2 border-purple-100 flex items-center justify-center mb-6 shadow-sm overflow-hidden relative group">
+        <div className="w-full aspect-square bg-white rounded-2xl border-2 border-purple-100 flex items-center justify-center mb-6 shadow-sm overflow-hidden relative group shrink-0">
           {loading ? (
              <div className="text-center p-4">
                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
@@ -58,7 +73,7 @@ const ImageModule: React.FC<ImageModuleProps> = ({ language, t }) => {
             <>
               <img src={result.imageUrl} alt="AI Generated" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                 <a href={result.imageUrl} download="kido-ai-art.png" className="bg-white text-purple-600 p-2 rounded-full shadow-lg font-bold flex items-center gap-2 transform hover:scale-105 transition-transform">
+                 <a href={result.imageUrl} download="kido-ai-art.png" className="bg-white text-purple-600 p-2 rounded-full shadow-lg font-bold flex items-center gap-2 transform hover:scale-105 transition-transform cursor-pointer">
                    <Download size={18} /> {t.image.save}
                  </a>
               </div>
@@ -74,12 +89,12 @@ const ImageModule: React.FC<ImageModuleProps> = ({ language, t }) => {
         </div>
 
         {/* Input Area */}
-        <div className="w-full bg-white p-4 rounded-2xl shadow-sm border border-purple-100">
+        <div className="w-full bg-white p-4 rounded-2xl shadow-sm border border-purple-100 mb-4 z-10">
           <label className="block text-sm font-bold text-gray-700 mb-2">{t.image.label}</label>
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
-              className="flex-1 p-3 border-2 border-purple-100 rounded-xl focus:outline-none focus:border-purple-400"
+              className="flex-1 p-3 border-2 border-purple-100 rounded-xl focus:outline-none focus:border-purple-400 transition-colors"
               placeholder={t.image.placeholder}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -87,31 +102,38 @@ const ImageModule: React.FC<ImageModuleProps> = ({ language, t }) => {
             <button 
               onClick={handleGenerate}
               disabled={loading || !prompt}
-              className="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center"
+              className="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center shadow-md active:scale-95"
             >
               {loading ? <RefreshCw className="animate-spin" /> : <Wand2 />}
             </button>
           </div>
           
-          <div className="space-y-2">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{t.image.suggestions_title}</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((s: string) => (
-                <button 
-                  key={s} 
-                  onClick={() => setPrompt(s)}
-                  className="bg-purple-50 text-purple-700 text-xs px-3 py-1.5 rounded-full hover:bg-purple-100 transition-colors border border-purple-200"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+          <div className="overflow-hidden w-full relative">
+             <div className="flex items-center gap-2 mb-2">
+                <Sparkles size={14} className="text-yellow-500" />
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{t.image.suggestions_title}</p>
+             </div>
+             
+             {/* Carousel Container */}
+             <div className="relative w-full overflow-hidden mask-linear-fade">
+                <div className="flex animate-scroll gap-3 w-max py-1">
+                  {carouselItems.map((s: string, idx: number) => (
+                    <button 
+                      key={`${idx}-${s}`} 
+                      onClick={() => setPrompt(s)}
+                      className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 text-xs px-4 py-2 rounded-full hover:from-purple-100 hover:to-pink-100 transition-all border border-purple-200 shadow-sm hover:shadow-md whitespace-nowrap hover:scale-105 active:scale-95"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+             </div>
           </div>
           
           {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
         </div>
         
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 p-3 rounded-xl flex gap-3 items-start">
+        <div className="mt-auto bg-yellow-50 border border-yellow-200 p-3 rounded-xl flex gap-3 items-start w-full">
            <div className="bg-yellow-400 text-white rounded-full w-6 h-6 flex-shrink-0 flex items-center justify-center text-xs font-bold">!</div>
            <p className="text-xs text-yellow-800">
              <span className="font-bold">{t.image.ethics_warning}</span> {t.image.ethics_desc}
