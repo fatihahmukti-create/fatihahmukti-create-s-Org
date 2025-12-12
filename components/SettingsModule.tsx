@@ -1,14 +1,17 @@
 import React from 'react';
-import { Settings, Globe } from 'lucide-react';
+import { Settings, Globe, User as UserIcon } from 'lucide-react';
 import { Language } from '../types';
+import { SimpleUser } from '../App';
 
 interface SettingsModuleProps {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: any;
+  user: SimpleUser | null;
 }
 
-const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, t }) => {
+const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, t, user }) => {
+
   return (
     <div className="flex flex-col h-full bg-slate-50 rounded-xl shadow-inner border border-slate-200 overflow-y-auto">
       <div className="bg-white p-4 border-b border-slate-200">
@@ -23,8 +26,40 @@ const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, 
         </div>
       </div>
 
-      <div className="p-4 flex-1">
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4">
+      <div className="p-4 flex-1 space-y-4">
+        
+        {/* Account Section */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+           <div className="flex items-center gap-3 mb-4">
+              <div className="bg-orange-100 p-2 rounded-full">
+                <UserIcon size={20} className="text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-700">Akun Kamu</h3>
+                <p className="text-xs text-gray-400">Info Profil</p>
+              </div>
+           </div>
+           
+           <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt="Profile" className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
+              ) : (
+                <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">
+                  {user?.displayName ? user.displayName.charAt(0) : 'U'}
+                </div>
+              )}
+              <div className="overflow-hidden">
+                <p className="font-bold text-slate-800 truncate">{user?.displayName || 'User'}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+              </div>
+           </div>
+           <div className="mt-2 text-[10px] text-slate-400 text-center bg-slate-50 p-2 rounded-lg">
+             Mode Tamu (Tanpa Login)
+           </div>
+        </div>
+
+        {/* Language Section */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
            <div className="flex items-center gap-3 mb-3">
               <div className="bg-blue-100 p-2 rounded-full">
                 <Globe size={20} className="text-blue-600" />
@@ -60,7 +95,7 @@ const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, 
         </div>
 
         <div className="text-center mt-8 opacity-50">
-           <p className="text-xs text-slate-400">KidoAI v1.1.0</p>
+           <p className="text-xs text-slate-400">KidoAI v1.2.0</p>
         </div>
       </div>
     </div>
