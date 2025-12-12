@@ -1,7 +1,8 @@
 import React from 'react';
-import { Settings, Globe, User as UserIcon } from 'lucide-react';
+import { Settings, Globe, User as UserIcon, Zap, ShieldCheck } from 'lucide-react';
 import { Language } from '../types';
 import { SimpleUser } from '../App';
+import { getActiveKeyMasked } from '../services/geminiService';
 
 interface SettingsModuleProps {
   language: Language;
@@ -28,6 +29,28 @@ const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, 
 
       <div className="p-4 flex-1 space-y-4">
         
+        {/* System Status Section */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl shadow-sm border border-green-100">
+           <div className="flex items-center gap-3 mb-2">
+              <div className="bg-green-100 p-2 rounded-full">
+                <Zap size={20} className="text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-green-800">Sistem AI</h3>
+                <p className="text-xs text-green-600">Status Koneksi</p>
+              </div>
+           </div>
+           <div className="bg-white/60 rounded-xl p-3 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500">Kunci Aktif:</span>
+              <div className="flex items-center gap-1.5">
+                 <ShieldCheck size={14} className="text-green-500" />
+                 <code className="text-xs font-mono bg-white px-2 py-1 rounded border border-green-200 text-green-700">
+                   {getActiveKeyMasked()}
+                 </code>
+              </div>
+           </div>
+        </div>
+
         {/* Account Section */}
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
            <div className="flex items-center gap-3 mb-4">
@@ -95,7 +118,7 @@ const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, 
         </div>
 
         <div className="text-center mt-8 opacity-50">
-           <p className="text-xs text-slate-400">KidoAI v1.3.0</p>
+           <p className="text-xs text-slate-400">KidoAI v1.3.1 - Vercel Edition</p>
         </div>
       </div>
     </div>

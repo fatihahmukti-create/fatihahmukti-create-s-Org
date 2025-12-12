@@ -5,15 +5,22 @@ import { Language } from '../types';
 // @ts-ignore
 const apiKey = process.env.API_KEY;
 
-// Debugging
+// Debugging: Cek di Console Browser (F12)
 if (!apiKey) {
-  console.error("⛔ [KidoAI Error] API Key fatal error.");
+  console.error("⛔ [KidoAI Error] API Key fatal error. Key kosong.");
 } else {
-  console.log("✅ [KidoAI] Layanan AI Terhubung.");
+  // Tampilkan 4 karakter terakhir untuk verifikasi validitas
+  const maskedKey = apiKey.length > 5 ? "..." + apiKey.slice(-4) : "INVALID";
+  console.log(`✅ [KidoAI] Layanan AI Terhubung. Menggunakan Key akhiran: ${maskedKey}`);
 }
 
 // Inisialisasi SDK
 const ai = new GoogleGenAI({ apiKey: apiKey || "MISSING_KEY" });
+
+export const getActiveKeyMasked = () => {
+  if (!apiKey) return "Tidak ada kunci";
+  return "..." + apiKey.slice(-4);
+}
 
 const getSystemInstruction = (lang: Language) => {
   if (lang === 'en') {
