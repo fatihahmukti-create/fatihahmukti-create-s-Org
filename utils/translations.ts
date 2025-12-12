@@ -32,7 +32,7 @@ export const translations = {
       title: 'Pengaturan',
       subtitle: 'Atur aplikasimu',
       language_label: 'Bahasa / Language',
-      language_desc: 'Pilih bahasa yang ingin kamu gunakan.'
+      language_desc: 'Pilih bahasa yang ingin kamu gunakan.',
     },
     chat: {
       title: 'Tanya Robo',
@@ -124,7 +124,7 @@ export const translations = {
       title: 'Settings',
       subtitle: 'Configure your app',
       language_label: 'Language / Bahasa',
-      language_desc: 'Choose the language you want to use.'
+      language_desc: 'Choose the language you want to use.',
     },
     chat: {
       title: 'Ask Robo',

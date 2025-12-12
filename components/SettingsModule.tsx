@@ -11,7 +11,7 @@ interface SettingsModuleProps {
 }
 
 const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, t, user }) => {
-
+  
   return (
     <div className="flex flex-col h-full bg-slate-50 rounded-xl shadow-inner border border-slate-200 overflow-y-auto">
       <div className="bg-white p-4 border-b border-slate-200">
@@ -95,7 +95,7 @@ const SettingsModule: React.FC<SettingsModuleProps> = ({ language, setLanguage, 
         </div>
 
         <div className="text-center mt-8 opacity-50">
-           <p className="text-xs text-slate-400">KidoAI v1.2.0</p>
+           <p className="text-xs text-slate-400">KidoAI v1.3.0</p>
         </div>
       </div>
     </div>
