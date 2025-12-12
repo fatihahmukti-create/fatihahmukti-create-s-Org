@@ -1,0 +1,7 @@
+{
+  "name": "KidoAI - Belajar AI & Etika",
+  "description": "Aplikasi edukasi interaktif untuk anak-anak mengenal dasar Artificial Intelligence dan etika penggunaannya.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
